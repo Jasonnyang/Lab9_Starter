@@ -87,7 +87,19 @@
     </section>
   </main>
 
+  <script src="https://cdn.trackjs.com/releases/current/tracker.js"></script>
   <script>
+    window.TrackJS && TrackJS.install({
+      token: "YOUR_TRACKJS_TOKEN"
+    });
+
+    class DivisionByZeroError extends Error {
+      constructor(message) {
+        super(message);
+        this.name = "DivisionByZeroError";
+      }
+    }
+
     let form = document.querySelector('form');
     form.addEventListener('submit', e => {
       e.preventDefault();
@@ -95,13 +107,46 @@
       let firstNum = document.querySelector('#first-num').value;
       let secondNum = document.querySelector('#second-num').value;
       let operator = document.querySelector('#operator').value;
-      output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+      try {
+        if (operator === '/' && secondNum == '0') {
+          throw new DivisionByZeroError('Division by zero is not allowed.');
+        }
+        output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+      } catch (error) {
+        console.error('An error occurred: ', error);
+        output.innerHTML = error.message;
+      }
     });
 
     let errorBtns = Array.from(document.querySelectorAll('#error-btns > button'));
 
-    // Start your code here
-    // You may move this JS to another file if you wish
+    // Console button functionality
+    document.getElementById('log').addEventListener('click', () => console.log('Console Log Demo'));
+    document.getElementById('error').addEventListener('click', () => console.error('Console Error Demo'));
+    document.getElementById('count').addEventListener('click', () => console.count('Console Count Demo'));
+    document.getElementById('warn').addEventListener('click', () => console.warn('Console Warn Demo'));
+    document.getElementById('assert').addEventListener('click', () => console.assert(false, 'Console Assert Demo'));
+    document.getElementById('clear').addEventListener('click', () => console.clear());
+    document.getElementById('dir').addEventListener('click', () => console.dir(document.body));
+    document.getElementById('dirxml').addEventListener('click', () => console.dirxml(document));
+    document.getElementById('group').addEventListener('click', () => {
+      console.group('Console Group');
+      console.log('Inside Group');
+    });
+    document.getElementById('groupEnd').addEventListener('click', () => console.groupEnd('Console Group'));
+    document.getElementById('table').addEventListener('click', () => console.table([{a:1, b:'Y'}, {a:2, b:'Z'}]));
+    document.getElementById('startTimer').addEventListener('click', () => console.time('Timer'));
+    document.getElementById('endTimer').addEventListener('click', () => console.timeEnd('Timer'));
+    document.getElementById('trace').addEventListener('click', () => console.trace('Console Trace Demo'));
+    document.getElementById('triggerError').addEventListener('click', () => {
+      // Triggering a global error
+      nonExistentFunction();
+    });
+
+    // Global error handler
+    window.onerror = function (message, source, lineno, colno, error) {
+      console.log(`Global Error caught: ${message} at ${source}:${lineno}:${colno}`);
+    };
   </script>
 </body>
 
